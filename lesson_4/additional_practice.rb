@@ -56,7 +56,7 @@ munsters.each do |name, details|
   when 0..18
     details["age_group"] = "kid"
   when 18..65
-    detai|s["age_group"] = "adult"
+    details["age_group"] = "adult"
   else
     details["age_group"] = "senior"
   end
