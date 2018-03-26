@@ -6,6 +6,7 @@ COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                                 [[1, 5, 9], [3, 5, 7]]   # doagmals
+WINNING_SCORE = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -68,10 +69,6 @@ def computer_places_piece!(brd)
   brd[square] = COMPUTER_MARKER
 end
 
-def keep_score(brd)
-
-end
-
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -91,8 +88,9 @@ def detect_winner(brd)
   nil
 end
 
-computer = 0
-player = 0
+computer_score = 0
+player_score = 0
+grand_winner = ' '
 
 loop do # main loop
   board = initialize_board
@@ -109,26 +107,29 @@ loop do # main loop
 
   display_board(board)
 
-    if detect_winner(board) == 'Player'
-      player += 1
-    else detect_winner(board) == 'Computer'
-      computer += 1
+  loop do
+    case detect_winner(board)
+    when 'Player'
+      player_score += 1
+      prompt "#{detect_winner(board)} won this round!"
+    when 'Computer'
+      computer_score += 1
+      prompt "#{detect_winner(board)} won this round!"
+    else
+      prompt "It's a tie!"
+    end
+    prompt "Computer #{computer_score}: Player #{player_score}.  First to win 5 games wins the match, press 'y' to continue"
+    user_input = gets.chomp
+    break if user_input.downcase.start_with?('y')
   end
 
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
-    prompt "Computer #{computer}: Player #{player}. Best out of five, play again? (y or n)"
-    answer = gets.chomp
-    break unless answer.downcase.start_with?('y')
-  end
+  grand_winner = detect_winner(board)
 
-  break if computer >= 5 || player >= 5
+  break if computer_score ==  WINNING_SCORE || player_score == WINNING_SCORE
 
 end
 
-if detect_winner == 'Player'
+if grand_winner == 'Player'
   puts "You won!"
 else
   puts "Computer won"
