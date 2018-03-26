@@ -68,6 +68,10 @@ def computer_places_piece!(brd)
   brd[square] = COMPUTER_MARKER
 end
 
+def keep_score(brd)
+
+end
+
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -87,7 +91,10 @@ def detect_winner(brd)
   nil
 end
 
-loop do
+computer = 0
+player = 0
+
+loop do # main loop
   board = initialize_board
 
   loop do
@@ -102,15 +109,29 @@ loop do
 
   display_board(board)
 
+    if detect_winner(board) == 'Player'
+      player += 1
+    else detect_winner(board) == 'Computer'
+      computer += 1
+  end
+
   if someone_won?(board)
     prompt "#{detect_winner(board)} won!"
   else
     prompt "It's a tie!"
+    prompt "Computer #{computer}: Player #{player}. Best out of five, play again? (y or n)"
+    answer = gets.chomp
+    break unless answer.downcase.start_with?('y')
   end
 
-  prompt "Play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break if computer >= 5 || player >= 5
+
+end
+
+if detect_winner == 'Player'
+  puts "You won!"
+else
+  puts "Computer won"
 end
 
 prompt "Thanks for playing tic tac toe, good bye!"
