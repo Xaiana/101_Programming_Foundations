@@ -5,7 +5,7 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
-                                [[1, 5, 9], [3, 5, 7]]   # doagmals
+                                [[1, 5, 9], [3, 5, 7]]   # diagnals
 WINNING_SCORE = 5
 
 def prompt(msg)
@@ -64,8 +64,40 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+  else
+    nil
+  end
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  if brd[5] == INITIAL_MARKER
+    square = brd[5]
+  end
+
+  # offense
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, COMPUTER_MARKER)
+      break if square
+    end
+  end
+
+  # defense
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, PLAYER_MARKER)
+      break if square
+    end
+  end
+
+  # just pick a square
+  if !square
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -118,15 +150,15 @@ loop do # main loop
     else
       prompt "It's a tie!"
     end
-    prompt "Computer #{computer_score}: Player #{player_score}.  First to win 5 games wins the match, press 'y' to continue"
+    prompt "Computer #{computer_score}: Player #{player_score}. \n
+     First to win 5 games wins the match, press 'y' to continue"
     user_input = gets.chomp
     break if user_input.downcase.start_with?('y')
   end
 
   grand_winner = detect_winner(board)
 
-  break if computer_score ==  WINNING_SCORE || player_score == WINNING_SCORE
-
+  break if computer_score == WINNING_SCORE || player_score == WINNING_SCORE
 end
 
 if grand_winner == 'Player'
