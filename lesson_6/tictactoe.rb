@@ -7,6 +7,7 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                                 [[1, 5, 9], [3, 5, 7]]   # diagnals
 WINNING_SCORE = 5
+FIRST = ['choose', 'player', 'computer']
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -66,19 +67,13 @@ end
 
 def find_at_risk_square(line, brd, marker)
   if brd.values_at(*line).count(marker) == 2
-    brd.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
-  else
+    brd.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
     nil
   end
 end
 
-def computer_choose_5(line, brd)
-  square = nil
-  if brd.select{|k,v| line.include?(k == 5) && v == INITIAL_MARKER}
-    square = brd[5]
-  else
-    square = empty_squares(brd).sample
-  end
+def computer_choose_5(brd)
+  5 if brd[5] == INITIAL_MARKER
 end
 
 def computer_places_piece!(brd)
@@ -132,6 +127,21 @@ def detect_winner(brd)
   nil
 end
 
+def who_first?(name)
+  answer = name.sample
+  loop do
+    if answer == 'choose'
+      puts "Who should go first? Pick one (computer or player)."
+      answer = gets.chomp
+      break
+    else
+      answer
+    end
+  end
+  answer
+  binding.pry
+end
+
 computer_score = 0
 player_score = 0
 grand_winner = ' '
@@ -141,13 +151,16 @@ loop do # main loop
 
   loop do
     display_board(board)
-
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    case who_first?(FIRST)
+    when FIRST == 'player'
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    when FIRST == 'computer'
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
   end
+
   display_board(board)
 
   loop do
